@@ -1,0 +1,15 @@
+{
+  "name": "myblogserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./bin/www.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=dev nodemon ./bin/www.js",
+    "prd": "cross-env NODE_ENV=production nodemon ./bin/www.js"
+  },
+  "author": "wanZhenDong",
+  "license": "ISC",
+  "devDependencies": {
+    "cross-env": "^7.0.2"
+  }
+}
