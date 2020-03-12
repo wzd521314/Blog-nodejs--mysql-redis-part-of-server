@@ -1,23 +1,76 @@
+const {exec} = require('../db/mysql')
+
 const getList = (author,keyword) => {
-  //先返回假数据（格式是正确的）
-  return [
-    {
-      id: 1,
-      title: '标题A',
-      content: '内容A',
-      creatTime: 1546610491112,
-      author: 'zhangsan'
-    },
-    {
-      id: 2,
-      title: '标题B',
-      content: '内容B',
-      creatTime: 1546610524733,
-      author: 'lisi'
-    },
-  ]
+  let sql = `select * from blogs where 1=1 `
+  if (author) {
+    sql += `and author='${author}'`
+  }
+  if (keyword) {
+    sql += `and title like '%${keyword}%' `
+  }
+  sql += `order by createtime desc`
+
+  //返回 promise
+  return exec(sql)
 }
 
+const getDetail = (id) => {
+  const sql = `select * from blogs where id='${id}'`
+  return exec(sql).then(rows => {
+    return rows[0]
+  })
+}
+
+const newBlog = (blogData = {}) => {
+  // blogData是一个博客对象。包含title content author createtime属性
+  const title = blogData.title
+  const content = blogData.content
+  const author = blogData.author
+  const createtime = Date.now()
+
+  const sql = `insert into blogs (title, content, createtime, author) values 
+              ('${title}', '${content}', ${createtime}, '${author}')`
+
+  return exec(sql).then(insertData => {
+    console.log(insertData)
+    return {
+      id: insertData.insertId
+    }
+  })
+}
+
+const updateBlog = (id, blogData = {}) => {
+   // blogData是一个博客对象。包含title content 属性
+   //id 就是要更新的博客的id
+   const title = blogData.title
+   const content = blogData.content
+
+   const sql = `update blogs set title='${title}', content='${content}' where id=${id}`
+
+   return exec(sql).then(updateData => {
+     console.log(updateData)
+     if (updateData.affectedRows > 0) {
+       return true
+     }
+     return false
+   })
+}
+
+const delBlog = (id, author) => {
+  //id就是要删除博客的id
+  const sql = `delete from blogs where id=${id} and author='${author}'`
+  return exec(sql).then(deleteData => {
+    console.log(deleteData)
+    if (deleteData.affectedRows > 0) {
+      return true
+    }
+    return false
+  })
+}
 module.exports = {
-  getList
+  getList,
+  getDetail,
+  newBlog,
+  updateBlog,
+  delBlog
 }
